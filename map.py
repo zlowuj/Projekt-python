@@ -23,3 +23,20 @@ class Map():
 
     def changePosition(self, x, y):
         self.map[x][y] = 3
+
+    def changeElement(self, x, y):
+        if self.getElement(x, y) == 0:
+            self.map[x][y]=1
+        elif self.getElement(x, y) == 1:
+            self.map[x][y]=2
+        elif self.getElement(x, y) == 2 and x!=0 and y!=0 and x!=self.dimension-1 and y!=self.dimension-1:
+            self.map[x][y]=1
+
+    def overwrite(self, map):
+        self.map=map
+
+    def resetMap(self):
+        for x in range(self.dimension):
+            for y in range(self.dimension):
+                if self.getElement(x, y) == 0:
+                    self.changeElement(x, y)
