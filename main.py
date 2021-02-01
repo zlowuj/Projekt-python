@@ -1,7 +1,7 @@
 import sys, pygame, map
 pygame.init()
 size = width, height = 1200, 1200
-dimension = 40
+dimension = 120
 startingWidth = dimension*1.5
 startingHeight = dimension*1.5
 black = 0, 0, 0
@@ -9,14 +9,20 @@ color = (255, 255, 255)
 color_light = (170, 170, 170)
 color_dark = (100, 100, 100)
 smallfont = pygame.font.SysFont('Corbel', 35)
+bigfont = pygame.font.SysFont('Corbel', 100)
 text1 = smallfont.render('play', True, color)
 text2 = smallfont.render('edit map', True, color)
 text3 = smallfont.render('play edited map', True, color)
+text4 = smallfont.render('GAME OVER', True, color)
+text5 = smallfont.render('YOU WIN', True, color)
+text6 = smallfont.render('press escape to go back to menu', True, color)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos=(0, 0), size=(dimension, dimension)):
         super(Player, self).__init__()
-        self.points=0
+        self.animationTime=0
+        self.points=1
+        self.stop=0
         self.boardX = startingWidth//dimension
         self.boardY = startingHeight//dimension
         self.speed = [0,0]
@@ -26,8 +32,13 @@ class Player(pygame.sprite.Sprite):
         self.board.changePosition(int(self.boardX), int(self.boardY))
         #print(self.board.mapPrint())
         self.original_image = pygame.Surface(size)
-        pac_man = pygame.image.load("pac_man.png")
+        self.pac_mans = [pygame.image.load("pac_man_1.png"), pygame.image.load("pac_man_2.png")]
+        pac_man = self.pac_mans[1]
         pac_man = pygame.transform.scale(pac_man, (dimension, dimension))
+        self.pac_mans[1] = pac_man
+        pac_man = self.pac_mans[0]
+        pac_man = pygame.transform.scale(pac_man, (dimension, dimension))
+        self.pac_mans[0] = pac_man
         self.original_image = pac_man
         self.image = self.original_image
         self.rect = self.image.get_rect()
@@ -40,7 +51,7 @@ class Player(pygame.sprite.Sprite):
                 if self.board.getElement(x, y) == 2:
                     pygame.draw.rect(screen, (255, 0, 0), (x*dimension,y*dimension, dimension-1, dimension-1))
                 if self.board.getElement(x, y) == 1:
-                    pygame.draw.circle(screen, 	(255,255,0), (x*dimension+dimension/2,y*dimension+dimension/2), 5)
+                    pygame.draw.circle(screen, 	(255,255,0), (x*dimension+dimension/2,y*dimension+dimension/2), dimension/10)
 
     def up(self):
         if self.flagW == 1:
@@ -99,6 +110,8 @@ class Player(pygame.sprite.Sprite):
             self.flagS = 0
         elif self.board.getElement(self.boardX, self.boardY+1) != 2:
             self.flagS = 1
+        if self.board.checkPoints(self.points) == 1:
+            self.stop=1
 
     def playerMove(self):
         x, y = self.rect.center
@@ -111,8 +124,19 @@ class Player(pygame.sprite.Sprite):
         self.boardY = y // dimension
         if self.board.getElement(self.boardX, self.boardY) == 1:
             self.board.eat(self.boardX, self.boardY)
+            self.points += 1
+            print(self.points)
         self.rect = self.rect.move(self.speed)
         self.board.changePosition(int(self.boardX), int(self.boardY))
+        #self.animationTime += 1
+        #if self.animationTime == 30 and self.image==self.pac_mans[0]:
+        #    self.original_image=self.pac_mans[1]
+        #    self.image = self.original_image
+        #    self.animationTime = 0
+        #elif self.animationTime == 30:
+        #    self.original_image = self.pac_mans[0]
+        #    self.image = self.original_image
+        #    self.animationTime = 0
         #print(self.board.mapPrint())
         #print(self.speed)
 
@@ -136,15 +160,16 @@ def main():
                         player.right()
                     if event.key == pygame.K_ESCAPE:
                         mode=0
-
-            player.playerMove()
-            player.check()
-            screen.fill(black)
-            screen.blit(player.image, player.rect)
-            player.draw()
-            pygame.display.set_caption("Pac-man: GAME")
-            pygame.display.update()
-            pygame.display.flip()
+                        player.stop = 0
+            if player.stop == 0:
+                player.playerMove()
+                player.check()
+                screen.fill(black)
+                screen.blit(player.image, player.rect)
+                player.draw()
+                pygame.display.set_caption("Pac-man: GAME")
+                pygame.display.update()
+                pygame.display.flip()
 
         width1 = width / 2
         width11 = width1 + width/5
@@ -225,15 +250,16 @@ def main():
                         playerEdit.right()
                     if event.key == pygame.K_ESCAPE:
                         mode=0
-
-            playerEdit.playerMove()
-            playerEdit.check()
-            screen.fill(black)
-            screen.blit(playerEdit.image, playerEdit.rect)
-            playerEdit.draw()
-            pygame.display.set_caption("Pac-man: GAME: edited map")
-            pygame.display.update()
-            pygame.display.flip()
+                        playerEdit.stop=0
+            if playerEdit.stop == 0:
+                playerEdit.playerMove()
+                playerEdit.check()
+                screen.fill(black)
+                screen.blit(playerEdit.image, playerEdit.rect)
+                playerEdit.draw()
+                pygame.display.set_caption("Pac-man: GAME: edited map")
+                pygame.display.update()
+                pygame.display.flip()
 
 if __name__ == '__main__':
 
