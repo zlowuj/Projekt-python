@@ -9,13 +9,14 @@ color = (255, 255, 255)
 color_light = (170, 170, 170)
 color_dark = (100, 100, 100)
 smallfont = pygame.font.SysFont('Corbel', 35)
-bigfont = pygame.font.SysFont('Corbel', 100)
+mediumfont = pygame.font.SysFont('Corbel', 70)
+bigfont = pygame.font.SysFont('Corbel', 200)
 text1 = smallfont.render('play', True, color)
 text2 = smallfont.render('edit map', True, color)
 text3 = smallfont.render('play edited map', True, color)
-text4 = smallfont.render('GAME OVER', True, color)
-text5 = smallfont.render('YOU WIN', True, color)
-text6 = smallfont.render('press escape to go back to menu', True, color)
+text4 = bigfont.render('GAME OVER', True, color)
+text5 = bigfont.render('YOU WIN', True, color)
+text6 = mediumfont.render('press escape to go back to menu', True, color)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos=(0, 0), size=(dimension, dimension)):
@@ -29,7 +30,7 @@ class Player(pygame.sprite.Sprite):
         self.speedNew = [0,0]
         self.flagW = self.flagS = self.flagA = self.flagD = 0
         self.board = map.Map(width//dimension)
-        self.board.changePosition(int(self.boardX), int(self.boardY))
+        self.board.map[int(self.boardX)][int(self.boardY)] = 3
         #print(self.board.mapPrint())
         self.original_image = pygame.Surface(size)
         self.pac_mans = [pygame.image.load("pac_man_1.png"), pygame.image.load("pac_man_2.png")]
@@ -125,9 +126,10 @@ class Player(pygame.sprite.Sprite):
         if self.board.getElement(self.boardX, self.boardY) == 1:
             self.board.eat(self.boardX, self.boardY)
             self.points += 1
-            print(self.points)
+            #print(self.points)
         self.rect = self.rect.move(self.speed)
         self.board.changePosition(int(self.boardX), int(self.boardY))
+        #print(self.board.mapPrint())
         #self.animationTime += 1
         #if self.animationTime == 30 and self.image==self.pac_mans[0]:
         #    self.original_image=self.pac_mans[1]
@@ -144,6 +146,7 @@ def main():
     player = Player(pos=(startingWidth, startingHeight))
     playerEdit = Player(pos=(startingWidth, startingHeight))
     newMap = playerEdit.board.map.copy()
+    newPoints = playerEdit.board.maxPoints
     mode=0
     while 1:
         while 1 and mode==1:
@@ -170,6 +173,11 @@ def main():
                 pygame.display.set_caption("Pac-man: GAME")
                 pygame.display.update()
                 pygame.display.flip()
+            else:
+                screen.blit(text5, (1, height/2))
+                screen.blit(text6, (width / 8, height / 1.5))
+                pygame.display.update()
+                pygame.display.flip()
 
         width1 = width / 2
         width11 = width1 + width/5
@@ -192,6 +200,8 @@ def main():
                         newMap=playerEdit.board.map.copy()
                         playerEdit = Player(pos=(startingWidth, startingHeight))
                         playerEdit.board.overwrite(newMap.copy())
+                        playerEdit.board.changePosition(int(playerEdit.boardX), int(playerEdit.boardY))
+
                     if width1 <= mouse[0] <= width11 and height3 <= mouse[1] <= height33:
                         mode=3
                         playerEdit.board.resetMap()
@@ -258,6 +268,11 @@ def main():
                 screen.blit(playerEdit.image, playerEdit.rect)
                 playerEdit.draw()
                 pygame.display.set_caption("Pac-man: GAME: edited map")
+                pygame.display.update()
+                pygame.display.flip()
+            else:
+                screen.blit(text5, (1, height/2))
+                screen.blit(text6, (width / 8, height / 1.5))
                 pygame.display.update()
                 pygame.display.flip()
 

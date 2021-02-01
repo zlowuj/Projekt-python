@@ -35,7 +35,9 @@ class Map():
         elif self.getElement(x, y) == 2 and x!=0 and y!=0 and x!=self.dimension-1 and y!=self.dimension-1:
             self.map[x][y]=1
             self.maxPoints += 1
-        print(self.maxPoints)
+        #elif self.getElement(x, y) == 3:
+        #    self.map[x][y] = 1
+        #print(self.maxPoints)
 
     def overwrite(self, map):
         self.map=map
@@ -43,8 +45,8 @@ class Map():
     def resetMap(self):
         for x in range(self.dimension):
             for y in range(self.dimension):
-                if self.getElement(x, y) == 0:
-                    self.changeElement(x, y)
+                if self.getElement(x, y) == 0 or self.getElement(x, y) == 3:
+                    self.map[x][y]=1
 
     def checkPoints(self, points):
         if self.maxPoints <= points:
