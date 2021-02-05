@@ -146,7 +146,7 @@ def main():
     player = Player(pos=(startingWidth, startingHeight))
     ghost1 = ghost.Ghost(player.board, dimension, width-(dimension*1.5), height-(dimension*1.5))
     player.board.map[int((width-(dimension*1.5))//dimension)][int((height-(dimension*1.5))//dimension)] = 4
-    print(player.board.mapPrint())
+    #print(player.board.mapPrint())
     playerEdit = Player(pos=(startingWidth, startingHeight))
     newMap = playerEdit.board.map.copy()
     newPoints = playerEdit.board.maxPoints
@@ -187,7 +187,7 @@ def main():
                 pygame.display.set_caption("Pac-man: GAME")
                 pygame.display.update()
                 pygame.display.flip()
-                print(player.board.mapPrint())
+                #(player.board.mapPrint())
             elif player.stop == 1:
                 screen.blit(text5, (1, height/2))
                 screen.blit(text6, (width / 8, height / 1.5))
@@ -231,7 +231,7 @@ def main():
                             Ghosts[i] = ghost.Ghost(playerEdit.board, dimension, ghostX[i], ghostY[i])
                             playerEdit.board.map[int((width - (dimension * 1.5)) // dimension)][int((height - (dimension * 1.5)) // dimension)] = 4
                             i += 1
-                        print(len(Ghosts))
+                        #print(len(Ghosts))
                         #ghost1 = ghost.Ghost(playerEdit.board, dimension, width - (dimension * 1.5), height - (dimension * 1.5))
                         #playerEdit.board.map[int((width - (dimension * 1.5)) // dimension)][int((height - (dimension * 1.5)) // dimension)] = 4
                     if width1 <= mouse[0] <= width11 and height3 <= mouse[1] <= height33:
@@ -242,7 +242,7 @@ def main():
                         playerEdit.board.overwrite(newMap.copy())
                         playerEdit.board.maxPoints = tempPoints
                         playerEdit.points = 0
-                        print(len(Ghosts))
+                        #print(len(Ghosts))
             mouse = pygame.mouse.get_pos()
             screen.fill(black)
             if width1 <= mouse[0] <= width11 and height1 <= mouse[1] <= height11:
@@ -280,6 +280,8 @@ def main():
                         playerEdit.board.maxPoints += 1
                     elif playerEdit.board.getElement(int(mouse[0]//dimension), int(mouse[1]//dimension)) == 1:
                         Ghosts.append(ghost.Ghost(playerEdit.board, dimension, int((mouse[0]//dimension)*(dimension)+(dimension/2)), int((mouse[1]//dimension)*(dimension)+(dimension/2))))
+                        ghostX.append(int((mouse[0]//dimension)*(dimension)+(dimension/2)))
+                        ghostY.append(int((mouse[1]//dimension)*(dimension)+(dimension/2)))
                         playerEdit.board.map[int(mouse[0] // dimension)][int(mouse[1] // dimension)] = 4
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
