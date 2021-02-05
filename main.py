@@ -1,7 +1,7 @@
 import sys, pygame, map, ghost
 pygame.init()
 size = width, height = 1200, 1200
-dimension = 120
+dimension = 30
 startingWidth = dimension*1.5
 startingHeight = dimension*1.5
 black = 0, 0, 0
@@ -151,6 +151,9 @@ def main():
     newMap = playerEdit.board.map.copy()
     newPoints = playerEdit.board.maxPoints
     mode=0
+    Ghosts = [ghost1]
+    ghostX = [width - (dimension * 1.5)]
+    ghostY = [height - (dimension * 1.5)]
     while 1:
         while 1 and mode==1:
             for event in pygame.event.get():
@@ -223,6 +226,14 @@ def main():
                         playerEdit.board.overwrite(newMap.copy())
                         playerEdit.board.changePosition(int(playerEdit.boardX), int(playerEdit.boardY))
                         playerEdit.board.maxPoints = tempPoints
+                        i = 0
+                        for x in Ghosts:
+                            Ghosts[i] = ghost.Ghost(playerEdit.board, dimension, ghostX[i], ghostY[i])
+                            playerEdit.board.map[int((width - (dimension * 1.5)) // dimension)][int((height - (dimension * 1.5)) // dimension)] = 4
+                            i += 1
+                        print(len(Ghosts))
+                        #ghost1 = ghost.Ghost(playerEdit.board, dimension, width - (dimension * 1.5), height - (dimension * 1.5))
+                        #playerEdit.board.map[int((width - (dimension * 1.5)) // dimension)][int((height - (dimension * 1.5)) // dimension)] = 4
                     if width1 <= mouse[0] <= width11 and height3 <= mouse[1] <= height33:
                         mode=3
                         tempPoints = playerEdit.board.maxPoints;
@@ -231,6 +242,7 @@ def main():
                         playerEdit.board.overwrite(newMap.copy())
                         playerEdit.board.maxPoints = tempPoints
                         playerEdit.points = 0
+                        print(len(Ghosts))
             mouse = pygame.mouse.get_pos()
             screen.fill(black)
             if width1 <= mouse[0] <= width11 and height1 <= mouse[1] <= height11:
@@ -257,8 +269,18 @@ def main():
         while 1 and mode == 2:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     playerEdit.board.changeElement(mouse[0]//dimension, mouse[1]//dimension)
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                    if playerEdit.board.getElement(int(mouse[0]//dimension), int(mouse[1]//dimension)) == 4:
+                        for x in Ghosts:
+                            if x.boardX == int(mouse[0]//dimension) and x.boardY == int(mouse[1]//dimension):
+                                Ghosts.remove(x)
+                        playerEdit.board.map[int(mouse[0] // dimension)][int(mouse[1] // dimension)] = 1
+                        playerEdit.board.maxPoints += 1
+                    elif playerEdit.board.getElement(int(mouse[0]//dimension), int(mouse[1]//dimension)) == 1:
+                        Ghosts.append(ghost.Ghost(playerEdit.board, dimension, int((mouse[0]//dimension)*(dimension)+(dimension/2)), int((mouse[1]//dimension)*(dimension)+(dimension/2))))
+                        playerEdit.board.map[int(mouse[0] // dimension)][int(mouse[1] // dimension)] = 4
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         mode=0
@@ -266,7 +288,12 @@ def main():
             screen.fill(black)
             screen.blit(playerEdit.image, playerEdit.rect)
             playerEdit.draw()
-            pygame.display.set_caption("Pac-man: EDIT MAP")
+            for x in Ghosts:
+                if x.rotation == 1:
+                    screen.blit(pygame.transform.flip(x.image, True, False), x.rect)
+                else:
+                    screen.blit(x.image, x.rect)
+            pygame.display.set_caption(" Pac-man: EDIT MAP")
             pygame.display.update()
             pygame.display.flip()
 
@@ -288,15 +315,38 @@ def main():
             if playerEdit.stop == 0:
                 #print()
                 playerEdit.playerMove()
+                for x in Ghosts:
+                    x.playerMove()
+                    x.check()
+                #ghost1.playerMove()
                 playerEdit.check()
+                ghost1.check()
+                for x in Ghosts:
+                    if playerEdit.boardX == x.boardX and playerEdit.boardY == x.boardY:
+                        playerEdit.stop = 2
                 screen.fill(black)
                 screen.blit(playerEdit.image, playerEdit.rect)
                 playerEdit.draw()
+                for x in Ghosts:
+                    if x.rotation == 1:
+                        screen.blit(pygame.transform.flip(x.image, True, False), x.rect)
+                        #print("ELLLEEEE")
+                    else:
+                        screen.blit(x.image, x.rect)
+                #if ghost1.rotation == 1:
+                #    screen.blit(pygame.transform.flip(ghost1.image, True, False), ghost1.rect)
+                #else:
+                #    screen.blit(ghost1.image, ghost1.rect)
                 pygame.display.set_caption("Pac-man: GAME: edited map")
                 pygame.display.update()
                 pygame.display.flip()
-            else:
+            elif playerEdit.stop == 1:
                 screen.blit(text5, (1, height/2))
+                screen.blit(text6, (width / 8, height / 1.5))
+                pygame.display.update()
+                pygame.display.flip()
+            else:
+                screen.blit(text4, (1, height / 2))
                 screen.blit(text6, (width / 8, height / 1.5))
                 pygame.display.update()
                 pygame.display.flip()
