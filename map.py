@@ -32,6 +32,8 @@ class Map():
         elif self.getElement(x, y) == 1:
             self.map[x][y]=2
             self.maxPoints -= 1
+            #("MAX PUNKTY")
+            #print(self.maxPoints)
         elif self.getElement(x, y) == 2 and x!=0 and y!=0 and x!=self.dimension-1 and y!=self.dimension-1:
             self.map[x][y]=1
             self.maxPoints += 1
@@ -49,6 +51,10 @@ class Map():
                     self.map[x][y]=1
 
     def checkPoints(self, points):
+        #print("punkty: ")
+        #print(points)
+        #print("MAX punkty: ")
+        #print(self.maxPoints)
         if self.maxPoints <= points:
             return 1
         else:

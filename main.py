@@ -1,4 +1,4 @@
-import sys, pygame, map
+import sys, pygame, map, ghost
 pygame.init()
 size = width, height = 1200, 1200
 dimension = 120
@@ -144,6 +144,9 @@ class Player(pygame.sprite.Sprite):
 
 def main():
     player = Player(pos=(startingWidth, startingHeight))
+    ghost1 = ghost.Ghost(player.board, dimension, width-(dimension*1.5), height-(dimension*1.5))
+    player.board.map[int((width-(dimension*1.5))//dimension)][int((height-(dimension*1.5))//dimension)] = 4
+    print(player.board.mapPrint())
     playerEdit = Player(pos=(startingWidth, startingHeight))
     newMap = playerEdit.board.map.copy()
     newPoints = playerEdit.board.maxPoints
@@ -166,15 +169,29 @@ def main():
                         player.stop = 0
             if player.stop == 0:
                 player.playerMove()
+                ghost1.playerMove()
                 player.check()
+                ghost1.check()
+                if player.boardX == ghost1.boardX and player.boardY == ghost1.boardY:
+                    player.stop = 2
                 screen.fill(black)
                 screen.blit(player.image, player.rect)
                 player.draw()
+                if ghost1.rotation == 1:
+                    screen.blit(pygame.transform.flip(ghost1.image, True, False), ghost1.rect)
+                else:
+                    screen.blit(ghost1.image, ghost1.rect)
                 pygame.display.set_caption("Pac-man: GAME")
                 pygame.display.update()
                 pygame.display.flip()
-            else:
+                print(player.board.mapPrint())
+            elif player.stop == 1:
                 screen.blit(text5, (1, height/2))
+                screen.blit(text6, (width / 8, height / 1.5))
+                pygame.display.update()
+                pygame.display.flip()
+            else:
+                screen.blit(text4, (1, height / 2))
                 screen.blit(text6, (width / 8, height / 1.5))
                 pygame.display.update()
                 pygame.display.flip()
@@ -194,19 +211,26 @@ def main():
                     if width1 <= mouse[0] <= width11 and height1 <= mouse[1] <= height11:
                         mode=1
                         player = Player(pos=(startingWidth, startingHeight))
+                        ghost1 = ghost.Ghost(player.board, dimension, width - (dimension * 1.5), height - (dimension * 1.5))
+                        player.board.map[int((width - (dimension * 1.5)) // dimension)][int((height - (dimension * 1.5)) // dimension)] = 4
+                        player.board.maxPoints -= 1
                     if width1 <= mouse[0] <= width11 and height2 <= mouse[1] <= height22:
                         mode=2
+                        tempPoints = playerEdit.board.maxPoints;
                         playerEdit.board.resetMap()
                         newMap=playerEdit.board.map.copy()
                         playerEdit = Player(pos=(startingWidth, startingHeight))
                         playerEdit.board.overwrite(newMap.copy())
                         playerEdit.board.changePosition(int(playerEdit.boardX), int(playerEdit.boardY))
-
+                        playerEdit.board.maxPoints = tempPoints
                     if width1 <= mouse[0] <= width11 and height3 <= mouse[1] <= height33:
                         mode=3
+                        tempPoints = playerEdit.board.maxPoints;
                         playerEdit.board.resetMap()
                         playerEdit = Player(pos=(startingWidth, startingHeight))
                         playerEdit.board.overwrite(newMap.copy())
+                        playerEdit.board.maxPoints = tempPoints
+                        playerEdit.points = 0
             mouse = pygame.mouse.get_pos()
             screen.fill(black)
             if width1 <= mouse[0] <= width11 and height1 <= mouse[1] <= height11:
@@ -262,6 +286,7 @@ def main():
                         mode=0
                         playerEdit.stop=0
             if playerEdit.stop == 0:
+                #print()
                 playerEdit.playerMove()
                 playerEdit.check()
                 screen.fill(black)
