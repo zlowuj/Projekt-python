@@ -1,7 +1,7 @@
 import sys, pygame, map, ghost
 pygame.init()
 size = width, height = 1200, 1200
-dimension = 30
+dimension = 120
 startingWidth = dimension*1.5
 startingHeight = dimension*1.5
 black = 0, 0, 0
@@ -47,12 +47,16 @@ class Player(pygame.sprite.Sprite):
         self.angle = 0
 
     def draw(self):
+        checkIf = 0
         for x in range(width//dimension):
             for y in range(width//dimension):
                 if self.board.getElement(x, y) == 2:
                     pygame.draw.rect(screen, (255, 0, 0), (x*dimension,y*dimension, dimension-1, dimension-1))
                 if self.board.getElement(x, y) == 1:
                     pygame.draw.circle(screen, 	(255,255,0), (x*dimension+dimension/2,y*dimension+dimension/2), dimension/10)
+                    checkIf = 1
+        if checkIf == 0:
+            self.stop == 1
 
     def up(self):
         if self.flagW == 1:
